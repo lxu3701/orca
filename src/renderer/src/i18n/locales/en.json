@@ -28359,6 +28359,8 @@
       "mentionedCount": "{{count}} mentioned",
       "correctMention": "Correct mention",
       "memberRemoved": "Member removed",
+      "turnEnded": "Ended",
+      "noReply": "No reply",
       "composerPlaceholder": "Message the group, @ to mention a bot",
       "startAConversationWithThisGroupMentionBots": "Start a conversation with this group. Mention bots with @Name or @everyone.",
       "repliesValue": "Replies: {{value0}}",

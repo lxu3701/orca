@@ -117,6 +117,10 @@ const BotGroupTurnSchema = z.object({
   /** The finished reply, saved when the turn ended; null when it ended without one. Absent while
    *  the turn runs, and on turns saved before replies were. */
   reply: z.string().nullable().optional(),
+  /** How the turn ended and how long it worked, saved with `reply`; absent while it runs and on
+   *  turns saved before this was. The room draws an ended turn from these, never from loaded rows. */
+  end: z.enum(['finished', 'stopped', 'failed']).optional().catch(undefined),
+  workedMs: z.number().nonnegative().optional().catch(undefined),
   /** Its answer to another member's request: sent as mail, so its own chat shows only the call. */
   answer: z.string().optional(),
   /** The members its reply named, saved as their hand-offs were reserved: a replay wakes none. */
@@ -276,11 +280,30 @@ export function botGroupTurnReplyText(
   return said ? `${said}\n\n${answer}` : answer
 }
 
+/** The most of a saved reply a room page carries per turn; the turn's own rows hold the rest. */
+export const BOT_GROUP_PAGE_REPLY_MAX = 4_000
+
+const FENCE = /^ {0,3}(`{3,}|~{3,})/
+
+/** A saved reply as a room page carries it: past the cap, its end from a whole line, after "…"; a
+ *  code block the cut began inside is reopened as plain text, so the rest still reads as code. */
+export function botGroupPageReply(reply: string): string {
+  if (reply.length <= BOT_GROUP_PAGE_REPLY_MAX) {
+    return reply
+  }
+  const end = reply.slice(-BOT_GROUP_PAGE_REPLY_MAX)
+  const rest = end.slice(end.indexOf('\n') + 1)
+  const fences = rest.split('\n').flatMap((line) => FENCE.exec(line)?.[1] ?? [])
+  const reopen = fences.length % 2 === 1 ? `${fences[0]}text\n` : ''
+  return `…\n\n${reopen}${rest}`
+}
+
 /** A turn's rows as the room draws them on desktop and mobile: its answer to a member's request
- *  closes them, unless its own words already said it. */
+ *  closes them, unless its own words already said it. An ended turn whose loaded rows hold none of
+ *  its words draws its saved reply instead. */
 export function withBotGroupTurnAnswer(
   messages: NativeChatMessage[],
-  turn: Pick<BotGroupTurn, 'operationId' | 'answer'>
+  turn: Pick<BotGroupTurn, 'operationId' | 'answer' | 'reply'>
 ): NativeChatMessage[] {
   const words = messages
     .flatMap((message) =>
@@ -289,13 +312,16 @@ export function withBotGroupTurnAnswer(
         : []
     )
     .join('\n')
-  return turn.answer?.trim() && !holdsAnswer(words, turn.answer)
+  const answer = words.trim()
+    ? turn.answer
+    : (botGroupTurnReplyText(turn.reply, turn.answer) ?? undefined)
+  return answer?.trim() && !holdsAnswer(words, answer)
     ? [
         ...messages,
         {
           id: `${turn.operationId}:answer`,
           role: 'assistant',
-          blocks: [{ type: 'text', text: turn.answer }],
+          blocks: [{ type: 'text', text: answer }],
           timestamp: null,
           source: 'transcript'
         }

@@ -1,6 +1,7 @@
 import { BotFailureError } from '../../shared/bots/bot-failure-copy'
 import type { z } from 'zod'
 import {
+  botGroupPageReply,
   isBotGroupMemberSession,
   type BotGroupMessage,
   type BotGroupSend,
@@ -303,10 +304,12 @@ export function readBotGroup(
   settleDeadGroupMailTurns(groups, messages)
   return {
     group,
-    // Saved replies feed later posts' context only; the room renders each turn from its chat.
+    // An ended turn draws from its saved reply and end, so the room needs none of its chat's rows.
     messages: presentPageAnswers(messages).map((message) => ({
       ...message,
-      turns: message.turns.map(({ reply: _reply, ...turn }) => turn)
+      turns: message.turns.map((turn) =>
+        turn.reply ? { ...turn, reply: botGroupPageReply(turn.reply) } : turn
+      )
     })),
     hasEarlier:
       messages.length > 0 &&

@@ -6069,6 +6069,8 @@
       "removingDefault": "移除 {{name}} 后，“回复”将改为“仅在被提及时”",
       "loadEarlierMessages": "加载更早的消息",
       "memberRemoved": "成员已移除",
+      "turnEnded": "已结束",
+      "noReply": "无回复",
       "composerPlaceholder": "给群组发消息，@ 提及 bot",
       "repliesValue": "回复：{{value0}}",
       "whoAnswers": "谁来回复你的消息",

@@ -1,4 +1,5 @@
 import type { z } from 'zod'
+import { readBotGroupTurnRows } from './bot-group-turn-rows'
 import type { BotGroupCreate, BotGroupSend, BotGroupUpdate } from '../../shared/bots/bot-group'
 import type {
   StructuredMailboxPointerHost,
@@ -159,6 +160,8 @@ export class BotGroupRuntime {
   newThread = (groupId: string) => createBotGroupThread(this, groupId)
   read = (groupId: string, beforeSequence?: number, threadId?: string) =>
     readBotGroup(this, groupId, beforeSequence, threadId)
+  turnRows = (groupId: string, operationId: string) =>
+    readBotGroupTurnRows(this, groupId, operationId)
   stop = (groupId: string, botId?: string, threadId?: string) =>
     stopBotGroup(this, groupId, botId, threadId)
   resumePending = () => resumePendingGroupDeliveries(this)

@@ -92,7 +92,13 @@ export class BotChangeNotices {
   }
 }
 
-type AgentPhaseChange = { kind: string; paneKey: string; workspace: { worktreeId: string } | null }
+type AgentPhaseChange = {
+  kind: string
+  paneKey: string
+  workspace: { worktreeId: string } | null
+  /** A move's new phase. */
+  to?: string
+}
 
 /** Which bot a pane works for, as the host can tell. */
 export type BotPaneFacts = {
@@ -137,7 +143,10 @@ export function botPhaseChangeScopes(
   }
   const tabId = parsePaneKey(change.paneKey)?.tabId
   const sessionId = tabId ? structuredAgentSessionIdOfTab(tabId) : null
-  if (sessionId && facts.inGroupRoom(sessionId)) {
+  // A member's turn end tells its room once its reply is saved (noteBotGroupMemberReply), so the
+  // room reads the turn as ended; telling it here too would send a second whole-host notice.
+  const turnEnded = change.kind === 'moved' && (change.to === 'done' || change.to === 'rest')
+  if (sessionId && !turnEnded && facts.inGroupRoom(sessionId)) {
     scopes.push({ kinds: ['groups'] })
   }
   return scopes

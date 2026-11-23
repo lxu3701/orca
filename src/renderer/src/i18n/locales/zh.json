@@ -28633,6 +28633,8 @@
       "mentionedCount": "已提及 {{count}} 个",
       "correctMention": "请修正提及",
       "memberRemoved": "成员已移除",
+      "turnEnded": "已结束",
+      "noReply": "无回复",
       "composerPlaceholder": "给群组发消息，@ 提及 bot",
       "startAConversationWithThisGroupMentionBots": "开始与此群组对话。使用 @名称 或 @everyone 提及 bots",
       "repliesValue": "回复：{{value0}}",

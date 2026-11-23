@@ -5635,6 +5635,8 @@
       "removingDefault": "Removing {{name}} changes Replies to Only when mentioned.",
       "loadEarlierMessages": "Load earlier messages",
       "memberRemoved": "Member removed",
+      "turnEnded": "Ended",
+      "noReply": "No reply",
       "composerPlaceholder": "Message the group, @ to mention a bot",
       "repliesValue": "Replies: {{value0}}",
       "whoAnswers": "Who answers your messages",

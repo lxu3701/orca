@@ -29,6 +29,7 @@ function renderTurn(shown: Turn) {
     <TooltipProvider>
       <BotGroupTurn
         hostId="local"
+        groupId="group"
         turn={shown}
         files={null}
         roomLinks={{ onLinkClick: undefined, request: () => {}, rootRef: createRef() }}
